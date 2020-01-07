@@ -2,4 +2,7 @@
 *.so
 *.egg-info
 __pycache__
-env*
+.vscode
+/env*
+/dist
+/build
