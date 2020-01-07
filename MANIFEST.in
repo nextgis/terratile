@@ -1,0 +1,9 @@
+include extension/*.?pp
+include CMakeLists.txt
+include terratile/preview.html
+
+include ctb/src/*
+
+include pybind11/CMakeLists.txt
+recursive-include pybind11/include *
+recursive-include pybind11/tools *

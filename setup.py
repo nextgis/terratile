@@ -46,6 +46,11 @@ class CMakeBuild(build_ext):
                 cwd=self.build_temp, env=env)
 
 
+try:
+    gv = subprocess.check_output(['gdal-config', '--version'], universal_newlines=True).strip()
+except CalledProcessError:
+    gv = None
+
 
 setup(
     name='terratile',
@@ -53,7 +58,7 @@ setup(
     version='0.1',
     python_requires='>=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, !=3.5.*, <4',
     url='https://github.com/nextgis/terratile',
-    author='NextGIS developers',
+    author='NextGIS',
     author_email='info@nextgis.com',
     license='MIT',
     classifiers=[
@@ -69,9 +74,18 @@ setup(
         'Programming Language :: Python :: 3.8',
     ],
 
-    py_modules=['terratile'],
-
+    packages=['terratile', ],
     ext_modules=[CMakeExtension('_terratile')],
     cmdclass=dict(build_ext=CMakeBuild),
     zip_safe=False,
+
+    extras_require={'server': [
+        'fastapi',
+        'uvicorn',
+        'jinja2',
+        'pygdal' + (('==%s.*' % gv) if gv else ''),
+    ]},
+    package_data={
+        '': ['*.html', ]
+    },
 )

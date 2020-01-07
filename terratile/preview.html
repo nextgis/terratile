@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Terratile preview</title>
+    <script src="https://cesium.com/downloads/cesiumjs/releases/1.63/Build/Cesium/Cesium.js"></script>
+    <link href="https://cesium.com/downloads/cesiumjs/releases/1.63/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+    <style type="text/css">
+        body { margin:0; }
+    </style>
+</head>
+<body>
+    <div id="cesiumContainer"></div>
+    <script>
+        var extent = Cesium.Rectangle.fromDegrees({{ bounds | join(', ') }});
+        Cesium.Camera.DEFAULT_VIEW_RECTANGLE = extent;
+        Cesium.Camera.DEFAULT_VIEW_FACTOR = 0.1;
+
+        var viewer = new Cesium.Viewer('cesiumContainer', {
+            animation: false,
+            baseLayerPicker: false,
+            fullscreenButton: false,
+            scene3DOnly: true,
+            selectionIndicator: false,
+            geocoder: false,
+            homeButton: false,
+            infoBox: false,
+            timeline: false,
+            navigationHelpButton: false,
+            useBrowserRecommendedResolution: false,
+            sceneMode : Cesium.SceneMode.SCENE3D,
+            terrainProvider : new Cesium.CesiumTerrainProvider({
+                url: '/{{ dataset }}/',
+                requestVertexNormals: true
+            }),
+            mapProjection : new Cesium.WebMercatorProjection()
+        });
+    </script>
+    </body>
+</html>
