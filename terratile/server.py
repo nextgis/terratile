@@ -103,7 +103,7 @@ def layer_json(dataset: str):
         name=dataset,
         description='',
         version='1.1.0',
-        format='heightmap-1.0',
+        format='quantized-mesh-1.0',
         attribution='',
         schema='tms',
         extensions=('octvertexnormals', ),

@@ -7,11 +7,13 @@
 #include "ctb/types.hpp"
 #include "ctb/GlobalGeodetic.hpp"
 #include "ctb/TileCoordinate.hpp"
-#include "ctb/TerrainTiler.hpp"
+#include "ctb/MeshTiler.hpp"
 
 #include "TemporaryOutputStream.hpp"
 
 namespace py = pybind11;
+
+const ctb::Grid grid = ctb::GlobalGeodetic();
 
 py::bytes build(
     size_t dataset,
@@ -20,10 +22,9 @@ py::bytes build(
     ctb::i_tile y
 ) {
     GDALDataset *poDataset = (GDALDataset *) dataset;
-    const ctb::Grid grid = ctb::GlobalGeodetic();
     const ctb::TileCoordinate coord = ctb::TileCoordinate(z, x, y);
-    const ctb::TerrainTiler tiler = ctb::TerrainTiler(poDataset, grid);
-    const auto tile = tiler.createTile(poDataset, coord);
+    const ctb::MeshTiler tiler = ctb::MeshTiler(poDataset, grid);
+    const auto tile = tiler.createMesh(poDataset, coord);
 
     auto stream = TemporaryOutputStream();
     tile->writeFile(stream);
