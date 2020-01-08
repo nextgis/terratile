@@ -15,7 +15,7 @@ namespace py = pybind11;
 
 const ctb::Grid grid = ctb::GlobalGeodetic();
 
-py::bytes build(
+py::bytes meshTile(
     size_t dataset,
     ctb::i_zoom z,
     ctb::i_tile x,
@@ -33,8 +33,15 @@ py::bytes build(
     return py::bytes(stream.compress());
 }
 
+ctb::i_zoom maxZoom(size_t dataset)
+{
+    const auto tiler = ctb::MeshTiler((GDALDataset *) dataset, grid);
+    return tiler.maxZoomLevel();
+}
+
 PYBIND11_MODULE(_terratile, m) {
-    m.def("build", &build);
+    m.def("mesh_tile", &meshTile);
+    m.def("max_zoom", &maxZoom);
 
 #ifdef VERSION_INFO
     m.attr("__version__") = VERSION_INFO;

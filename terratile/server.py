@@ -10,7 +10,7 @@ from starlette.templating import Jinja2Templates
 
 from osgeo import gdal, osr
 
-from terratile import build
+from terratile import mesh_tile, max_zoom
 
 CFG_DATA_PATH = Path(os.environ.get('TERRATILE_DATA_PATH', './'))
 CFG_EXTENSIONS = ('.tif', '.tiff', '.vrt')
@@ -70,11 +70,9 @@ class Dataset(object):
         # TODO: Reproject bounds to EPSG:4326
         self.bounds = (self.min_x, self.min_y, self.max_x, self.max_y)
 
-        z = 0
         tres = self.tile_res
-        minres = 16 * min(abs(xres), abs(yres))
         self.avtile = []
-        while True:
+        for z in range(0, max_zoom(self.gdal_ds)):
             self.avtile.append((
                 math.floor((self.min_x - self.tile_origin[0]) / tres),
                 math.floor((self.min_y - self.tile_origin[1]) / tres),
@@ -85,11 +83,7 @@ class Dataset(object):
                 else (0, 0, 0, 0)
             ))
 
-            z += 1
             tres /= 2
-
-            if tres < minres:
-                break
 
 
 app = FastAPI()
@@ -122,7 +116,7 @@ def layer_json(dataset: str):
 @app.get('/{dataset}/{z}/{x}/{y}.terrain')
 def tile(dataset: str, z: int, x: int, y: int):
     ds = Dataset.from_name(dataset)
-    data = build(ds.gdal_ds, (z, x, y))
+    data = mesh_tile(ds.gdal_ds, (z, x, y))
     return Response(data, media_type="application/octet-stream", headers={
         'Access-Control-Allow-Origin': '*',
         'Content-Encoding': 'gzip',

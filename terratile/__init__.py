@@ -4,8 +4,12 @@ from __future__ import division, absolute_import, print_function, unicode_litera
 import _terratile
 
 
-def build(dataset, tile):
+def mesh_tile(dataset, tile):
     z, x, y = tile
-    return _terratile.build(
+    return _terratile.mesh_tile(
         int(dataset.this),
         int(z), int(x), int(y))
+
+
+def max_zoom(dataset):
+    return _terratile.max_zoom(int(dataset.this))
