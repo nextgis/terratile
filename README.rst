@@ -28,7 +28,7 @@ Usage example
     from osgeo import gdal
 
     ds = gdal.Open(path_to_dataset, gdal.GA_ReadOnly)
-    data = terratile.build(ds, (z, x, y))
+    data = terratile.mesh_tile(ds, (z, x, y))
 
 Terrain tile server
 -------------------
