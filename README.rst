@@ -8,7 +8,7 @@ Build requirements (package names in Ubuntu are shown in parentheses):
 
 * GDAL library (``libgdal20`` and ``libgdal-dev``)
 * ZLib library (``zlib1g``, ``zlib1g-dev``)
-* C++ compiler and CMake (``build-essentials`` and ``cmake``)
+* C++ compiler and CMake (``build-essential`` and ``cmake``)
 * Python 2.7+ or 3.6+ with header files (``python-dev`` or ``python3-dev``)
 
 Install into virtualenv:
