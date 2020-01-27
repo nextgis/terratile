@@ -34,7 +34,7 @@ class Dataset(object):
                 obj = Dataset(str(fn))
                 cls.datasets[name] = obj
                 return obj
-        
+
         return None
 
     def __init__(self, filename):
@@ -44,7 +44,7 @@ class Dataset(object):
         self.tile_res = 180
         self.tile_origin = (-180, -90)
 
-        ulx, xres, xskew, uly, yskew, yres  = self.gdal_ds.GetGeoTransform()
+        ulx, xres, xskew, uly, yskew, yres = self.gdal_ds.GetGeoTransform()
         lrx = ulx + (self.gdal_ds.RasterXSize * xres)
         lry = uly + (self.gdal_ds.RasterYSize * yres)
 
@@ -72,6 +72,7 @@ class Dataset(object):
 
 app = FastAPI()
 templates = Jinja2Templates(directory=str(Path(__file__).parent.resolve()))
+
 
 @app.get('/{dataset}/layer.json')
 def layer_json(dataset: str):
