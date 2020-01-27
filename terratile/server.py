@@ -18,9 +18,6 @@ CFG_EXTENSIONS = ('.tif', '.tiff', '.vrt')
 EPSG_4326 = osr.SpatialReference()
 EPSG_4326.ImportFromEPSG(4326)
 
-EPSG_3857 = osr.SpatialReference()
-EPSG_3857.ImportFromEPSG(3857)
-
 
 class Dataset(object):
     datasets = dict()
@@ -42,32 +39,22 @@ class Dataset(object):
 
     def __init__(self, filename):
         self.gdal_ds = gdal.Open(filename, gdal.GA_ReadOnly)
-        
-        sr = osr.SpatialReference()
-        sr.ImportFromProj4(self.gdal_ds.GetProjection())
+        self.sr = osr.SpatialReference(wkt=self.gdal_ds.GetProjection())
 
-        if sr.IsSameGeogCS(EPSG_4326):
-            self.sr = EPSG_4326
-            self.tile_res = 180
-            self.tile_origin = (-180, -90)
-        elif sr.IsSameGeogCS(EPSG_3857):
-            self.sr = EPSG_3857
-            self.tile_res = 2 * 20037508.34
-            self.tile_origin = (-20037508.34, -20037508.34)
-        else:
-            raise ValueError("Only EPSG:4326 and EPSG:3857 supported!")
+        self.tile_res = 180
+        self.tile_origin = (-180, -90)
 
         ulx, xres, xskew, uly, yskew, yres  = self.gdal_ds.GetGeoTransform()
         lrx = ulx + (self.gdal_ds.RasterXSize * xres)
         lry = uly + (self.gdal_ds.RasterYSize * yres)
 
-        self.ul = (ulx, uly)
-        self.lr = (lrx, lry)
+        transform = osr.CoordinateTransformation(self.sr, EPSG_4326)
+        ul = transform.TransformPoint(ulx, uly)
+        lr = transform.TransformPoint(lrx, lry)
 
-        self.min_x, self.min_y = min(ulx, lrx), min(uly, lry)
-        self.max_x, self.max_y = max(ulx, lrx), max(uly, lry)
+        self.min_x, self.min_y = min(ul[0], lr[0]), min(ul[1], lr[1])
+        self.max_x, self.max_y = max(ul[0], lr[0]), max(ul[1], lr[1])
 
-        # TODO: Reproject bounds to EPSG:4326
         self.bounds = (self.min_x, self.min_y, self.max_x, self.max_y)
 
         tres = self.tile_res
@@ -78,10 +65,7 @@ class Dataset(object):
                 math.floor((self.min_y - self.tile_origin[1]) / tres),
                 math.ceil((self.max_x - self.tile_origin[0]) / tres) - 1,
                 math.ceil((self.max_y - self.tile_origin[1]) / tres) - 1,
-            ) if z > 0 else (
-                (0, 0, 1, 0) if self.sr == EPSG_4326
-                else (0, 0, 0, 0)
-            ))
+            ) if z > 0 else (0, 0, 1, 0))
 
             tres /= 2
 
@@ -102,7 +86,7 @@ def layer_json(dataset: str):
         schema='tms',
         extensions=('octvertexnormals', ),
         tiles=('{z}/{x}/{y}.terrain', ),
-        projection='EPSG:4326' if ds.sr == EPSG_4326 else 'EPSG:3857',
+        projection='EPSG:4326',
         bounds=ds.bounds,
         available=[
             (OrderedDict(zip(('startX', 'startY', 'endX', 'endY'), a)), )
