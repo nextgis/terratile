@@ -29,8 +29,9 @@ class CMakeBuild(build_ext):
 
         config = 'Debug' if self.debug else 'Release'
         cmake_args = [
+            '-DPYTHON_EXECUTABLE=' + sys.executable,
             '-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + os.path.abspath(os.path.split(extdir)[0]),
-            '-DCMAKE_BUILD_TYPE=' + config
+            '-DCMAKE_BUILD_TYPE=' + config,
         ]
 
         build_args = ['--config', config, '--', '-j2']
