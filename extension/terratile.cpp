@@ -19,15 +19,17 @@ py::bytes meshTile(
     size_t dataset,
     ctb::i_zoom z,
     ctb::i_tile x,
-    ctb::i_tile y
+    ctb::i_tile y,
+    double meshQuality=1.0,
+    bool writeNormals=false
 ) {
     GDALDataset *poDataset = (GDALDataset *) dataset;
     const ctb::TileCoordinate coord = ctb::TileCoordinate(z, x, y);
-    const ctb::MeshTiler tiler = ctb::MeshTiler(poDataset, grid);
+    const ctb::MeshTiler tiler = ctb::MeshTiler(poDataset, grid, meshQuality);
     const auto tile = tiler.createMesh(poDataset, coord);
 
     auto stream = TemporaryOutputStream();
-    tile->writeFile(stream);
+    tile->writeFile(stream, writeNormals);
     delete tile;
 
     return py::bytes(stream.compress());

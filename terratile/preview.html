@@ -4,8 +4,8 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Terratile preview</title>
-    <script src="https://cesium.com/downloads/cesiumjs/releases/1.65/Build/Cesium/Cesium.js"></script>
-    <link href="https://cesium.com/downloads/cesiumjs/releases/1.65/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+    <script src="https://cesium.com/downloads/cesiumjs/releases/1.71/Build/Cesium/Cesium.js"></script>
+    <link href="https://cesium.com/downloads/cesiumjs/releases/1.71/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
     <style type="text/css">
         body { margin:0; }
         #cesiumContainer {
@@ -13,7 +13,7 @@
             padding:0; margin:0;
             top:0; left:0;
             width: 100%;
-            height: 100%;            
+            height: 100%;
         }
     </style>
 </head>
@@ -23,6 +23,18 @@
         var extent = Cesium.Rectangle.fromDegrees({{ bounds | join(', ') }});
         Cesium.Camera.DEFAULT_VIEW_RECTANGLE = extent;
         Cesium.Camera.DEFAULT_VIEW_FACTOR = 0.1;
+        var osm = new Cesium.OpenStreetMapImageryProvider({
+            url : 'https://a.tile.openstreetmap.org/',
+            maximumLevel:19
+        });
+
+        var datasetResource = new Cesium.Resource({
+                url: '/{{ dataset }}/',
+                queryParameters: {
+                  {{ 'normals: true,' if normals else ''}}
+                  {{ "quality: %s" % quality if quality else ''}}
+                }
+            });
 
         var viewer = new Cesium.Viewer('cesiumContainer', {
             animation: false,
@@ -33,16 +45,31 @@
             geocoder: false,
             homeButton: false,
             infoBox: false,
-            timeline: false,
+            timeline: true, //false,
+            shadows: true,
             navigationHelpButton: false,
-            useBrowserRecommendedResolution: false,
+            imageryProvider : osm,
+            //useBrowserRecommendedResolution: false, //stuttering on 1440p displays
             sceneMode : Cesium.SceneMode.SCENE3D,
             terrainProvider : new Cesium.CesiumTerrainProvider({
-                url: '/{{ dataset }}/',
-                requestVertexNormals: true
+                url: datasetResource,
+                requestVertexNormals: {{ normals | tojson | replace("\"", "") }}
             }),
-            mapProjection : new Cesium.WebMercatorProjection()
+            //mapProjection : new Cesium.WebMercatorProjection()
         });
+        viewer.extend(Cesium.viewerCesiumInspectorMixin);
+        viewer.scene.globe.baseColor= Cesium.Color.fromCssColorString('#f2f2f2');
+        viewer.scene.globe.enableLighting=true;
+        viewer.scene.globe.depthTestAgainstTerrain=true;
+        viewer.shadowMap.enabled=true;
+        viewer.terrainShadows = Cesium.ShadowMode.ENABLED;
+        viewer.clock.currentTime = new Cesium.JulianDate.fromIso8601( '2012-04-24T10:10');
+        document.body.onkeyup = function(e){
+            if(e.key===' ' || e.key === 'Spacebar'){
+                viewer.scene.camera.flyTo({destination:extent});
+           }
+        }
+
     </script>
     </body>
 </html>
