@@ -75,8 +75,11 @@ templates = Jinja2Templates(directory=str(Path(__file__).parent.resolve()))
 
 
 @app.get('/{dataset}/layer.json')
-def layer_json(dataset: str):
+def layer_json(dataset: str, normals:bool=False):
     ds = Dataset.from_name(dataset)
+    tiles_url='{z}/{x}/{y}.terrain'
+    if normals:
+        tiles_url+='?normals=True'
     data = OrderedDict(
         tilejson='2.1.0',
         name=dataset,
@@ -85,8 +88,8 @@ def layer_json(dataset: str):
         format='quantized-mesh-1.0',
         attribution='',
         schema='tms',
-        extensions=('octvertexnormals', ),
-        tiles=('{z}/{x}/{y}.terrain', ),
+        extensions=['octvertexnormals'] if normals else [],
+        tiles=(tiles_url, ),
         projection='EPSG:4326',
         bounds=ds.bounds,
         available=[
@@ -99,20 +102,23 @@ def layer_json(dataset: str):
 
 
 @app.get('/{dataset}/{z}/{x}/{y}.terrain')
-def tile(dataset: str, z: int, x: int, y: int):
+def tile(dataset: str, z: int, x: int, y: int, normals: bool=False, quality: float=1.0):
     ds = Dataset.from_name(dataset)
-    data = mesh_tile(ds.gdal_ds, (z, x, y))
+    data = mesh_tile(ds.gdal_ds, (z, x, y), write_normals=normals, quality=quality)
     return Response(data, media_type="application/octet-stream", headers={
         'Access-Control-Allow-Origin': '*',
         'Content-Encoding': 'gzip',
+        'Cache-Control': 'max-age=600'
     })
 
 
 @app.get('/{dataset}/preview')
-def preview(request: Request, dataset: str):
+def preview(request: Request, dataset: str, normals:bool=None, quality:float=None):
     ds = Dataset.from_name(dataset)
     return templates.TemplateResponse('preview.html', {
         'request': request,
         'dataset': dataset,
         'bounds': ds.bounds,
+        'quality': quality,
+        'normals':normals
     })
