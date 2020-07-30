@@ -20,8 +20,8 @@ py::bytes meshTile(
     ctb::i_zoom z,
     ctb::i_tile x,
     ctb::i_tile y,
-    double meshQuality=1.0,
-    bool writeNormals=false
+    bool writeNormals=false,
+    double meshQuality=1.0
 ) {
     GDALDataset *poDataset = (GDALDataset *) dataset;
     const ctb::TileCoordinate coord = ctb::TileCoordinate(z, x, y);
