@@ -1,6 +1,3 @@
-[submodule "ctb"]
-	path = ctb
-	url = https://github.com/nextgis/cesium-terrain-builder.git
 [submodule "pybind11"]
 	path = pybind11
 	url = https://github.com/pybind/pybind11.git
