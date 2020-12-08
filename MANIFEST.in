@@ -2,7 +2,7 @@ include extension/*.?pp
 include CMakeLists.txt
 include terratile/preview.html
 
-include ctb/src/*
+include third-party/ctb/*
 
 include pybind11/CMakeLists.txt
 recursive-include pybind11/include *
