@@ -1,0 +1,18 @@
+FROM osgeo/gdal:latest
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update -y && \
+	apt-get -y install --no-install-recommends --yes cmake build-essential \
+    libz-dev python3-distutils python3-dev python3-pip
+
+# Install the application.
+ADD . /usr/local/src/terratile/
+
+# v1 via Cmake
+#RUN mkdir /usr/local/src/terratile/build
+#WORKDIR /usr/local/src/terratile/build
+#RUN cmake .. && cmake --build . --config release
+
+# v2 via pip
+RUN pip3 install -e /usr/local/src/terratile
