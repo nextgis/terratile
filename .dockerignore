@@ -1,0 +1,9 @@
+env*
+data/
+Dockerfile*
+
+**/.git
+
+build/
+*.egg-info
+**/*.so

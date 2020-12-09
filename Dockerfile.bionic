@@ -1,0 +1,26 @@
+FROM ubuntu:18.04
+ENV LC_ALL=C.UTF-8
+
+RUN set -ex; export DEBIAN_FRONTEND=noninteractive; \
+    apt-get update; apt-get --yes -qq install --no-install-recommends  \
+        curl ca-certificates nano python-dev python3-dev \
+        libgdal20 libgdal-dev zlib1g zlib1g-dev build-essential cmake; \
+    rm -rf /var/lib/apt/lists/*
+
+RUN set -ex; \
+    curl -sSL https://bootstrap.pypa.io/get-pip.py > /tmp/get-pip.py; \
+    python2 /tmp/get-pip.py; \
+    python3 /tmp/get-pip.py; \
+    rm /tmp/get-pip.py
+
+COPY . /src
+WORKDIR /src
+
+RUN pip3 install ./[server]
+RUN pip2 install ./
+
+RUN mkdir /data
+WORKDIR /data
+
+CMD uvicorn terratile.server:app --host 0.0.0.0 --port 8000 --workers 4
+EXPOSE 8000/tcp
