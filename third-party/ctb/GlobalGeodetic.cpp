@@ -27,7 +27,11 @@ using namespace ctb;
 static OGRSpatialReference
 setSRS(void) {
   OGRSpatialReference srs;
+
+  #if GDAL_VERSION_NUM >= GDAL_COMPUTE_VERSION(3,0,0)
   srs.SetAxisMappingStrategy(OAMS_TRADITIONAL_GIS_ORDER);
+  #endif // GDAL_VERSION_NUM >= GDAL_COMPUTE_VERSION(3,0,0)
+
   srs.importFromEPSG(4326);
   return srs;
 }

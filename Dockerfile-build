@@ -1,10 +1,10 @@
-FROM osgeo/gdal:latest
+FROM ubuntu:18.04
 
 ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update -y && \
 	apt-get -y install --no-install-recommends --yes cmake build-essential \
-    libz-dev python3-distutils python3-dev python3-pip
+    libz-dev python3-distutils python3-dev python3-pip python3-setuptools libgdal-dev
 
 # Install the application.
 ADD . /usr/local/src/terratile/
