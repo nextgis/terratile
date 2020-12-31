@@ -1,0 +1,77 @@
+#ifndef CTBCONFIG_HPP
+#define CTBCONFIG_HPP
+
+/*******************************************************************************
+ * Copyright 2014 GeoData <geodata@soton.ac.uk>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations
+ * under the License.
+ *******************************************************************************/
+
+/**
+ * @file config.hpp.in
+ * @brief Build time configured options and settings
+ *
+ * This file is a template used by the CMake build system to create
+ * `config.hpp`.
+ */
+
+/* Enable symbol export in Visual Studio 2013 as per issue #6.  This is an
+   adaptation of `CPL_DLL` in GDAL's `cpl_port.h`. */
+#ifndef CTB_DLL
+#if defined(_MSC_VER)
+#  if !defined(CPL_DISABLE_DLL)
+#    define CTB_DLL     __declspec(dllexport)
+#  else
+#    define CTB_DLL     __declspec(dllimport)
+#  endif
+#else
+#  define CTB_DLL
+#endif
+#endif
+
+#include <string>
+#include <sstream>
+
+namespace ctb {
+
+  /**
+   * @brief Versioning object
+   *
+   * We use [semantic versioning](http://semver.org).
+   */
+  const struct semver {
+    /// The major version
+    const unsigned short int major;
+    /// The minor version
+    const unsigned short int minor;
+    /// The patch number
+    const unsigned short int patch;
+
+    /// The version string
+    const char *cstr;
+
+  } version = {
+    @CTB_VERSION_MAJOR@,
+    @CTB_VERSION_MINOR@,
+    @CTB_VERSION_PATCH@,
+    "@CTB_VERSION_MAJOR@.@CTB_VERSION_MINOR@.@CTB_VERSION_PATCH@"
+  };
+
+  /// The width and height of height data in a tile
+  const unsigned short int TILE_SIZE = @TERRAIN_TILE_SIZE@;
+
+  /// The width and height of water mask data in a tile
+  const unsigned short int MASK_SIZE = @TERRAIN_MASK_SIZE@;
+}
+
+#endif /* CTBCONFIG_HPP */
