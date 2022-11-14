@@ -6,6 +6,7 @@ project(terratile)
 set(CMAKE_COLOR_MAKEFILE ON)
 # Set path to additional CMake modules
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
+include(FindAnyProject)
 
 include(util)
 check_version(CTB_VERSION_MAJOR CTB_VERSION_MINOR CTB_VERSION_PATCH)
@@ -43,7 +44,6 @@ include_directories(
 )
 
 # We need GDAL
-include(FindAnyProject)
 find_anyproject(GDAL REQUIRED VERSION 2.0)
 
 string(SUBSTRING ${GDAL_VERSION_STRING} 0 1 GDAL_VERSION_MAJOR)
@@ -57,7 +57,7 @@ find_anyproject(ZLIB REQUIRED)
 set(LIBS ${LIBS} ${ZLIB_LIBRARIES} ${GDAL_LIBRARIES})
 
 # PYBIND11
-add_subdirectory(pybind11)
+add_subdirectory(third-party/pybind11)
 
 pybind11_add_module(_terratile
     extension/terratile.cpp

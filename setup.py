@@ -61,29 +61,15 @@ setup(
     name='terratile',
     description='Simple wrapper of cesium terrain builder (libctb) for terrain tiles generation.',
     version=VERSION,
-    python_requires='>=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, !=3.5.*, <4',
+    python_requires='>=3.8, <4',
     url='https://github.com/nextgis/terratile',
     author='NextGIS',
     author_email='info@nextgis.com',
     license='MIT',
-    classifiers=[
-        'Development Status :: 3 - Alpha',
-        'Intended Audience :: Developers',
-        'Topic :: Software Development :: Build Tools',
-        'License :: OSI Approved :: MIT License',
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
-        'Programming Language :: Python :: 3.8',
-    ],
-
     packages=['terratile', ],
     ext_modules=[CMakeExtension('_terratile')],
     cmdclass=dict(build_ext=CMakeBuild),
     zip_safe=False,
-
     extras_require={'server': [
         'fastapi',
         'uvicorn',
@@ -91,6 +77,6 @@ setup(
         'pygdal' + (('==%s.*' % gv) if gv else ''),
     ]},
     package_data={
-        '': ['*.html', ]
+        '': ['*.html', 'example/*']
     },
 )
