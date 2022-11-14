@@ -3,7 +3,7 @@ import math
 from pathlib import Path
 from collections import OrderedDict
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from starlette.requests import Request
 from starlette.responses import Response, JSONResponse
 from starlette.templating import Jinja2Templates
@@ -19,7 +19,7 @@ EPSG_4326 = osr.SpatialReference()
 EPSG_4326.ImportFromEPSG(4326)
 
 
-class Dataset(object):
+class Dataset:
     datasets = dict()
 
     @classmethod
@@ -35,7 +35,7 @@ class Dataset(object):
                 cls.datasets[name] = obj
                 return obj
 
-        return None
+        raise HTTPException(status_code=404, detail=f"Dataset '{name}' not found.")
 
     def __init__(self, filename):
         self.gdal_ds = gdal.Open(filename, gdal.GA_ReadOnly)
