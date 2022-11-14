@@ -2,10 +2,14 @@ import os
 import sys
 import subprocess
 from os import path, makedirs
-from io import open
 
 from setuptools import setup, find_packages, Extension
 from setuptools.command.build_ext import build_ext
+
+
+with open('VERSION', 'r') as fd:
+    VERSION = fd.read().rstrip()
+
 
 here = path.abspath(path.dirname(__file__))
 
@@ -49,14 +53,14 @@ class CMakeBuild(build_ext):
 
 try:
     gv = subprocess.check_output(['gdal-config', '--version'], universal_newlines=True).strip()
-except CalledProcessError:
+except subprocess.CalledProcessError:
     gv = None
 
 
 setup(
     name='terratile',
     description='Simple wrapper of cesium terrain builder (libctb) for terrain tiles generation.',
-    version='0.1',
+    version=VERSION,
     python_requires='>=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, !=3.5.*, <4',
     url='https://github.com/nextgis/terratile',
     author='NextGIS',
