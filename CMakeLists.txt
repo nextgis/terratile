@@ -44,7 +44,7 @@ include_directories(
 )
 
 # We need GDAL
-find_anyproject(GDAL REQUIRED VERSION 2.0)
+find_anyproject(GDAL REQUIRED VERSION 3.0)
 
 string(SUBSTRING ${GDAL_VERSION_STRING} 0 1 GDAL_VERSION_MAJOR)
 include_directories(

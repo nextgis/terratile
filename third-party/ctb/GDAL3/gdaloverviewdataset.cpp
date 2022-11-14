@@ -121,7 +121,7 @@ class GDALOverviewBand final: public GDALProxyRasterBand
     GDALOverviewBand( GDALOverviewDataset* poDS, int nBand );
     ~GDALOverviewBand() override;
 
-    CPLErr FlushCache() override;
+    CPLErr FlushCache();
 
     int GetOverviewCount() override;
     GDALRasterBand *GetOverview( int ) override;
