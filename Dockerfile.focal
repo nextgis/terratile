@@ -5,9 +5,8 @@ RUN set -ex; export DEBIAN_FRONTEND=noninteractive; \
     apt-get update; apt-get --yes -qq install --no-install-recommends  \
         curl ca-certificates nano \
         build-essential cmake \
-        python3-dev python3-pip python3-setuptools \
-        libgdal26 libgdal-dev \
-        zlib1g zlib1g-dev ; \
+        python3-dev python3-pip python3-setuptools python3-packaging \
+        libgdal26 libgdal-dev zlib1g zlib1g-dev; \
     rm -rf /var/lib/apt/lists/*
 
 COPY . /src
@@ -17,5 +16,5 @@ RUN pip3 install ./[server]
 
 WORKDIR /src/example
 
-CMD uvicorn terratile.server:app --host 0.0.0.0 --port 8000 --workers 4
+CMD ["uvicorn", "terratile.server:app", "--host=0.0.0.0", "--port=8000", "--workers=4"]
 EXPOSE 8000/tcp
