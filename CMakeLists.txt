@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.10)
 
 project(terratile)
 
@@ -70,7 +70,7 @@ pybind11_add_module(_terratile
     ${CTB_SRC}/MeshTiler.cpp
     ${CTB_SRC}/MeshTile.cpp
     ${CTB_SRC}/GlobalMercator.cpp
-    ${CTB_SRC}/GlobalGeodetic.cpp    
+    ${CTB_SRC}/GlobalGeodetic.cpp
     ${CTB_SRC}/CTBFileOutputStream.cpp
     ${CTB_SRC}/CTBZOutputStream.cpp
 )
