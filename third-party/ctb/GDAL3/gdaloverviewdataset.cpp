@@ -116,7 +116,9 @@ class GDALOverviewBand final: public GDALProxyRasterBand
 
     GDALRasterBand*         poUnderlyingBand = nullptr;
 
-#if GDAL_VERSION_NUM >= GDAL_COMPUTE_VERSION(3,5,0)
+#if GDAL_VERSION_NUM >= GDAL_COMPUTE_VERSION(3,8,0)
+    GDALRasterBand* RefUnderlyingRasterBand(bool bForceOpen = true) const override;
+#elif GDAL_VERSION_NUM >= GDAL_COMPUTE_VERSION(3,5,0)
     GDALRasterBand* RefUnderlyingRasterBand() const override;
 #else
     GDALRasterBand* RefUnderlyingRasterBand() override;
@@ -224,7 +226,7 @@ GDALOverviewDataset::GDALOverviewDataset( GDALDataset* poMainDSIn,
     SetDescription( poMainDS->GetDescription() );
 
     CPLDebug( "GDAL", "GDALOverviewDataset(%s, this=%p) creation.",
-              poMainDS->GetDescription(), this );
+              poMainDS->GetDescription(), (void*)this );
 
     papszOpenOptions = CSLDuplicate(poMainDS->GetOpenOptions());
     // Add OVERVIEW_LEVEL if not called from GDALOpenEx(), but directly.
@@ -599,7 +601,9 @@ CPLErr GDALOverviewBand::FlushCache()
 /*                        RefUnderlyingRasterBand()                     */
 /************************************************************************/
 
-#if GDAL_VERSION_NUM >= GDAL_COMPUTE_VERSION(3,5,0)
+#if GDAL_VERSION_NUM >= GDAL_COMPUTE_VERSION(3,8,0)
+GDALRasterBand* GDALOverviewBand::RefUnderlyingRasterBand(bool) const
+#elif GDAL_VERSION_NUM >= GDAL_COMPUTE_VERSION(3,5,0)
 GDALRasterBand* GDALOverviewBand::RefUnderlyingRasterBand() const
 #else
 GDALRasterBand* GDALOverviewBand::RefUnderlyingRasterBand()
