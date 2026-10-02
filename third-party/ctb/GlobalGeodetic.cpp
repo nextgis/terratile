@@ -24,16 +24,20 @@
 using namespace ctb;
 
 // Set the spatial reference
-static OGRSpatialReference
-setSRS(void) {
-  OGRSpatialReference srs;
+const OGRSpatialReference&
+GlobalGeodetic::getSRS(void) {
+  // Lazily initialized: calling into GDAL/PROJ while static initializers of
+  // this module still run (i.e. at dlopen() time) crashes with GDAL >= 3.12.
+  static const OGRSpatialReference srs = []() {
+    OGRSpatialReference s;
 
-  #if GDAL_VERSION_NUM >= GDAL_COMPUTE_VERSION(3,0,0)
-  srs.SetAxisMappingStrategy(OAMS_TRADITIONAL_GIS_ORDER);
-  #endif // GDAL_VERSION_NUM >= GDAL_COMPUTE_VERSION(3,0,0)
+    #if GDAL_VERSION_NUM >= GDAL_COMPUTE_VERSION(3,0,0)
+    s.SetAxisMappingStrategy(OAMS_TRADITIONAL_GIS_ORDER);
+    #endif // GDAL_VERSION_NUM >= GDAL_COMPUTE_VERSION(3,0,0)
 
-  srs.importFromEPSG(4326);
+    s.importFromEPSG(4326);
+    return s;
+  }();
+
   return srs;
 }
-
-const OGRSpatialReference GlobalGeodetic::cSRS = setSRS();

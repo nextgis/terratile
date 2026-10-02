@@ -43,14 +43,16 @@ public:
   GlobalGeodetic(i_tile tileSize = TILE_SIZE, bool tmsCompatible = true):
     Grid(tileSize,
          CRSBounds(-180, -90, 180, 90),
-         cSRS,
+         getSRS(),
          (tmsCompatible) ? 2 : 1)
   {}
 
 protected:
 
-  /// The EPSG:4326 spatial reference system
-  static const OGRSpatialReference cSRS;
+  /// The EPSG:4326 spatial reference system.  Built on first use: GDAL must not
+  /// be touched during static initialization (PROJ database access segfaults
+  /// since GDAL 3.12).
+  static const OGRSpatialReference& getSRS();
 };
 
 #endif /* GLOBALGEODETIC_HPP */

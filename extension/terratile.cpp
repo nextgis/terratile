@@ -13,7 +13,13 @@
 
 namespace py = pybind11;
 
-const ctb::Grid grid = ctb::GlobalGeodetic();
+// Lazily built: constructing the grid reaches into GDAL/PROJ, which must not
+// happen while static initializers of this module are still running.
+static const ctb::Grid &
+grid() {
+    static const ctb::Grid g = ctb::GlobalGeodetic();
+    return g;
+}
 
 py::bytes meshTile(
     size_t dataset,
@@ -25,7 +31,7 @@ py::bytes meshTile(
 ) {
     GDALDataset *poDataset = (GDALDataset *) dataset;
     const ctb::TileCoordinate coord = ctb::TileCoordinate(z, x, y);
-    const ctb::MeshTiler tiler = ctb::MeshTiler(poDataset, grid, meshQuality);
+    const ctb::MeshTiler tiler = ctb::MeshTiler(poDataset, grid(), meshQuality);
     const auto tile = tiler.createMesh(poDataset, coord);
 
     auto stream = TemporaryOutputStream();
@@ -37,7 +43,7 @@ py::bytes meshTile(
 
 ctb::i_zoom maxZoom(size_t dataset)
 {
-    const auto tiler = ctb::MeshTiler((GDALDataset *) dataset, grid);
+    const auto tiler = ctb::MeshTiler((GDALDataset *) dataset, grid());
     return tiler.maxZoomLevel();
 }
 

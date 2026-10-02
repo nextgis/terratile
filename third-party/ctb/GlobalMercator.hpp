@@ -42,7 +42,7 @@ public:
   GlobalMercator(i_tile tileSize = 256):
     Grid(tileSize,
          CRSBounds(-cOriginShift, -cOriginShift, cOriginShift, cOriginShift),
-         cSRS)
+         getSRS())
   {}
 
 protected:
@@ -57,8 +57,10 @@ protected:
   /// The coordinate origin (the middle of the grid extent)
   static const double cOriginShift;
 
-  /// The EPSG:3785 spatial reference system
-  static const OGRSpatialReference cSRS;
+  /// The EPSG:3857 spatial reference system.  Built on first use: GDAL must not
+  /// be touched during static initialization (PROJ database access segfaults
+  /// since GDAL 3.12).
+  static const OGRSpatialReference& getSRS();
 };
 
 #endif /* GLOBALMERCATOR_HPP */

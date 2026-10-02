@@ -31,16 +31,20 @@ const double GlobalMercator::cEarthCircumference = 2 * M_PI * GlobalMercator::cS
 const double GlobalMercator::cOriginShift = GlobalMercator::cEarthCircumference / 2.0;
 
 // Set the spatial reference
-static OGRSpatialReference
-setSRS(void) {
-  OGRSpatialReference srs;
+const OGRSpatialReference&
+GlobalMercator::getSRS(void) {
+  // Lazily initialized: calling into GDAL/PROJ while static initializers of
+  // this module still run (i.e. at dlopen() time) crashes with GDAL >= 3.12.
+  static const OGRSpatialReference srs = []() {
+    OGRSpatialReference s;
 
-  #if GDAL_VERSION_NUM >= GDAL_COMPUTE_VERSION(3,0,0)
-  srs.SetAxisMappingStrategy(OAMS_TRADITIONAL_GIS_ORDER);
-  #endif // GDAL_VERSION_NUM >= GDAL_COMPUTE_VERSION(3,0,0)
+    #if GDAL_VERSION_NUM >= GDAL_COMPUTE_VERSION(3,0,0)
+    s.SetAxisMappingStrategy(OAMS_TRADITIONAL_GIS_ORDER);
+    #endif // GDAL_VERSION_NUM >= GDAL_COMPUTE_VERSION(3,0,0)
 
-  srs.importFromEPSG(3857);
+    s.importFromEPSG(3857);
+    return s;
+  }();
+
   return srs;
 }
-
-const OGRSpatialReference GlobalMercator::cSRS = setSRS();

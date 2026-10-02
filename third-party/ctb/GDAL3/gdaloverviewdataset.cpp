@@ -39,7 +39,9 @@
 #include "gdal_mdreader.h"
 #include "gdal_proxy.h"
 
+#if GDAL_VERSION_NUM < GDAL_COMPUTE_VERSION(3,12,0)
 CPL_CVSID("$Id$")
+#endif
 
 /** In GDAL, GDALRasterBand::GetOverview() returns a stand-alone band, that may
     have no parent dataset. This can be inconvenient in certain contexts, where
@@ -89,7 +91,11 @@ class GDALOverviewDataset final: public GDALDataset
     ~GDALOverviewDataset() override;
 
     const OGRSpatialReference* GetSpatialRef() const override;
+#if GDAL_VERSION_NUM >= GDAL_COMPUTE_VERSION(3,12,0)
+    CPLErr GetGeoTransform( GDALGeoTransform &gt ) const override;
+#else
     CPLErr GetGeoTransform( double * ) override;
+#endif
 
     int GetGCPCount() override;
     const OGRSpatialReference *GetGCPSpatialRef() const override;
@@ -381,6 +387,22 @@ const OGRSpatialReference *GDALOverviewDataset::GetSpatialRef() const
 /*                          GetGeoTransform()                           */
 /************************************************************************/
 
+#if GDAL_VERSION_NUM >= GDAL_COMPUTE_VERSION(3,12,0)
+CPLErr GDALOverviewDataset::GetGeoTransform( GDALGeoTransform &gt ) const
+
+{
+    if( poMainDS->GetGeoTransform(gt) != CE_None )
+        return CE_Failure;
+
+    const double dfOvrXRatio =
+        static_cast<double>(poMainDS->GetRasterXSize()) / nRasterXSize;
+    const double dfOvrYRatio =
+        static_cast<double>(poMainDS->GetRasterYSize()) / nRasterYSize;
+    gt.Rescale(dfOvrXRatio, dfOvrYRatio);
+
+    return CE_None;
+}
+#else
 CPLErr GDALOverviewDataset::GetGeoTransform( double * padfTransform )
 
 {
@@ -401,6 +423,7 @@ CPLErr GDALOverviewDataset::GetGeoTransform( double * padfTransform )
 
     return CE_None;
 }
+#endif
 
 /************************************************************************/
 /*                            GetGCPCount()                             */
